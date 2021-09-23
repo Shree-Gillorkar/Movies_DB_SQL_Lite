@@ -2,39 +2,55 @@ package net.sqlitetutorial;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 
-public class CreateNewTable {
+public class InsertData {
 
-    public static void NewTable() {
+   
+    private Connection connect() {
         // SQLite connection string
         String url = "jdbc:sqlite:C://sqlite/db/SHREE.db";
-        
-        // SQL statement for creating a new table
-        String sql = "CREATE TABLE IF NOT EXISTS Movies (\n"
-                + " Id integer PRIMARY KEY,\n"
-                + " Movie_Name text NOT NULL,\n"
-		+ " Lead_Actor text NOT NULL,\n"
-		+ " Lead_Actress text NOT NULL,\n"
-		+ " Director_Name text NOT NULL,\n"
-		+ " Year_Of_Release integer NOT NULL\n"
-                + ");";
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return conn;
+    }
 
-        
-        try (Connection conn = DriverManager.getConnection(url);
-                Statement stmt = conn.createStatement()) {
-            // create a new table
-            stmt.execute(sql);
+    
+    public void insert(String Movie_Name,String Lead_Actor,String Lead_Actress,String Director_name, Integer Year_Of_Release) {
+        String sql = "INSERT INTO Movies(Movie_Name,Lead_Actor,Lead_Actress,Director_name,Year_Of_Release) VALUES(?,?,?,?,?)";
+
+        try (Connection conn = this.connect();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            	pstmt.setString(1, Movie_Name);
+		pstmt.setString(2, Lead_Actor);
+		pstmt.setString(3, Lead_Actress);
+		pstmt.setString(4, Director_name);
+            	pstmt.setInt(5, Year_Of_Release);
+            	pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    
     public static void main(String[] args) {
-        NewTable();
+
+        InsertData data = new InsertData();
+        // insert three new rows
+	data.insert("Hera Pheri","Akshay Kumar,Sunil Shetty,Paresh Rawal","Tabu","Priyadarshan Soman", 2000);
+	data.insert("Phir Hera Pheri","Akshay Kumar, Sunil Shetty ,Paresh Rawal","Bipasha Basu, Rimi","Neeraj Vora", 2006);
+        data.insert("Jhon Wick[Chapter 1]","Keanu Reeves","NA","Chad Stahelski", 2014);
+	data.insert("Jhon Wick[Chapter 2]","Keanu Reeves","NA","Chad Stahelski", 2017);
+	data.insert("Jhon Wick[Chapter 3]","Keanu Reeves","NA","Chad Stahelski", 2019);
+        data.insert("Chhichhore","Sushant Singh Rajput","Shraddha Kapoor","Nitesh Tiwari", 2019);
+	data.insert("Kesari","Akshay Kumar","Parineeti Chopra","Anurag Singh", 2019);
+	data.insert("Shershaah","Sidharth Malhotra","Kiara Advani","Vishnuvardhan", 2021);
+	
     }
 
 }
